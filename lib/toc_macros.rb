@@ -28,7 +28,7 @@ module TocMacros
     def generate_html_for_page(project, wiki_page)
       str = ""
       str << "<li>"
-      str << "<a href=#{Rails.application.routes.url_helpers.project_wiki_page_path(project, wiki_page.title)}>#{wiki_page.title}</a>"
+      str << "<a href=#{Rails.application.routes.url_helpers.project_wiki_page_path(project.identified, wiki_page.title)}>#{wiki_page.title}</a>"
       str << "</li>"
       str
     end
