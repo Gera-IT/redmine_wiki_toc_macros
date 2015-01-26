@@ -3,22 +3,45 @@ module TocMacros
     desc "Displays a list of child pages"
     macro :wiki_toc do |obj, args|
       params = TocMacros.parse_params(args)
-      p params
       allowed_fields = [:title, :created_at, :modified_at, :by_author, :by_parent, :"!title", :"!created_at", :"!modified_at", :"!by_author", :"!by_parent"]
       sort_by = params[:sort].to_sym if  allowed_fields.include?(params[:sort].to_sym)
       sort_by = sort_by || :title
+      current_obj = obj.page
+      @@o = "<ul>"
 
-      o = '<ul>'
-      obj.page.children.eval(TocMacros.sort_relations[sort_by]).each do |child|
-        o << TocMacros.generate_html_for_page(obj.page.project, child)
+
+
+      TocMacros.get_ancestors(current_obj, sort_by, params[:depth].to_i)
+      @@o << "</ul>"
+      @@o.html_safe
       end
-      o << "</ul>"
-      o.html_safe
+
+
 
     end
-  end
 
   class << self
+
+    def get_ancestors(page, sort_by, depth)
+      return if page.children.empty?
+      return if depth == 0
+      page.children.eval(TocMacros.sort_relations[sort_by]).each do |child_wiki_page|
+        TocMacros.generate_html_for_page(page.project, child_wiki_page)
+        if page.children.last == child_wiki_page
+          depth = depth -1
+        end
+        # TocMacros.generate_list(child, sort_by)
+        get_ancestors(child_wiki_page, sort_by, depth)
+      end
+    end
+
+    def generate_list(page, sort_by)
+      @@o << '<ul>'
+      page.children.eval(TocMacros.sort_relations[sort_by]).each do |child|
+        @@o << TocMacros.generate_html_for_page(page.project, child)
+      end
+      @@o << "</ul>"
+    end
 
 
     def collection_for_pages(wiki_page)
@@ -26,11 +49,9 @@ module TocMacros
     end
 
     def generate_html_for_page(project, wiki_page)
-      str = ""
-      str << "<li>"
-      str << "<a href=#{Rails.application.routes.url_helpers.project_wiki_page_path(project.identifier, wiki_page.title)}>#{wiki_page.title}</a>"
-      str << "</li>"
-      str
+      @@o << "<li style='margin-left: #{wiki_page.ancestors.count*5}px'>"
+      @@o << "<a href=#{Rails.application.routes.url_helpers.project_wiki_page_path(project.identifier, wiki_page)}>#{wiki_page.pretty_title}</a>"
+      @@o << "</li>"
     end
 
     def sort_relations
