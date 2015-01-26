@@ -10,7 +10,7 @@ module TocMacros
 
       o = '<ul>'
       obj.page.children.eval(TocMacros.sort_relations[sort_by]).each do |child|
-        o << TocMacros.generate_html_for_page(obj.page, child)
+        o << TocMacros.generate_html_for_page(obj.page.project, child)
       end
       o << "</ul>"
       o.html_safe
