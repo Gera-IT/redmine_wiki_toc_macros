@@ -50,7 +50,7 @@ module TocMacros
 
     def generate_html_for_page(project, wiki_page)
       @@o << "<li style='margin-left: #{wiki_page.ancestors.count*5}px'>"
-      @@o << "<a href=#{Rails.application.routes.url_helpers.project_wiki_page_path(project.identifier, wiki_page)}>#{wiki_page.pretty_title}</a>"
+      @@o << "<a href=#{Rails.application.routes.url_helpers.project_wiki_page_path(project.identifier, wiki_page.title)}>#{wiki_page.pretty_title}</a>"
       @@o << "</li>"
     end
 
