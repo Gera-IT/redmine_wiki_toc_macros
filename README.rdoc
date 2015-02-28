@@ -1,3 +1,0 @@
-= redmine_wiki_toc_macros
-
-Description goes here
